@@ -3,15 +3,18 @@
 
 #include "quinticSpline.hpp"
 
-Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
 namespace spline
 {
-void Quintic::printSpline(const std::string &name)
+
+void Quintic::write(const std::string &name)
 {
+	Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
 	std::ofstream file(name);
-	file << x().format(fmt) << '\n'
-		 << y().format(fmt) << '\n'
-		 << h().format(fmt) << '\n';
+	for (size_t i = 0; i < component().size(); i++)
+	{
+		file << component()[i].format(fmt) << '\n';
+	}
+	file << h().format(fmt) << '\n';
 	file.close();
 }
 
@@ -21,33 +24,58 @@ Quintic &Quintic::operator=(const Quintic &sp)
 		return *this;
 	else
 	{
-		_node.resize(sp.node().rows(), 2);
-		_node = sp.node();
-		_h.resize(sp.h().size());
-		_h = sp.h();
-		_x.resize(sp.x().rows(), 6);
-		_x = sp.x();
-		_y.resize(sp.y().rows(), 6);
-		_y = sp.y();
-		return *this;
+		// 	_node.resize(sp.node().rows(), 2);
+		// 	_node = sp.node();
+		// 	_h.resize(sp.h().size());
+		// 	_h = sp.h();
+		// 	_x.resize(sp.x().rows(), 6);
+		// 	_x = sp.x();
+		// 	_y.resize(sp.y().rows(), 6);
+		// 	_y = sp.y();
+		// 	return *this;
 	}
 };
 
-void Quintic::node(const Eigen::MatrixX2d &xy)
+void Quintic::node(const Eigen::MatrixXd &xy)
 {
 	_node.resize(xy.rows(), xy.cols());
 	_node = xy;
+	_dim = xy.cols();
+	_component.resize(dim());
+
 	h(_node);
-	setComponent(0, _x);
-	setComponent(1, _y);
+
+	for (Eigen::size_t i = 0; i < dim(); i++)
+	{
+		setComponent(i, _component[i]);
+	}
 }
 
-void Quintic::h(const Eigen::MatrixX2d &node)
+void Quintic::node(const Eigen::MatrixXd &xy, const Eigen::VectorXd &chord)
+{
+	_node.resize(xy.rows(), xy.cols());
+	_node = xy;
+	_dim = xy.cols();
+	_component.resize(dim());
+
+	_h = chord;
+
+	for (Eigen::size_t i = 0; i < dim(); i++)
+	{
+		setComponent(i, _component[i]);
+	}
+}
+
+void Quintic::h(const Eigen::MatrixXd &node)
 {
 	_h.setZero(node.rows() - 1);
-	for (int i = 0; i < _h.size(); i++)
+	for (Eigen::size_t i = 0; i < _h.size(); i++)
 	{
-		_h(i) = sqrt(pow(node(i + 1, 0) - node(i, 0), 2.0) + pow(node(i + 1, 1) - node(i, 1), 2.0));
+		double tmp = 0;
+		for (Eigen::size_t k = 0; k < node.cols(); k++)
+			tmp += pow(node(i + 1, k) - node(i, k), 2.0);
+
+		_h(i) = sqrt(tmp);
 	}
 };
 
@@ -57,16 +85,64 @@ void Quintic::setComponent(int i, Coef &x)
 	x.setZero();
 	x.col(0) = _node.col(i);
 };
-
-void Quintic::x(BC bc0, BC bc1, double a0, double b0, double a1, double b1)
+const Eigen::VectorXd Quintic::arcCoord() const
 {
-	computeCoef(_x, bc0, bc1, a0, b0, a1, b1);
+	Eigen::VectorXd tmp;
+	tmp.resize(h().size() + 1);
+	tmp.setZero();
+	for (Eigen::Index i = 1; i < tmp.size(); i++)
+	{
+		tmp[i] = tmp[i - 1] + localArc(i - 1);
+	}
+	return tmp;
+};
+const Eigen::VectorXd Quintic::arcIncrement() const
+{
+	Eigen::VectorXd tmp;
+	tmp.resize(h().size());
+	tmp.setZero();
+	for (Eigen::Index i = 0; i < tmp.size(); i++)
+	{
+		tmp[i] = localArc(i);
+	}
+	return tmp;
 };
 
-void Quintic::y(BC bc0, BC bc1, double a0, double b0, double a1, double b1)
+void Quintic::computeComponent(int k, BC bc0, BC bc1, double a0, double b0, double a1, double b1)
 {
-	computeCoef(_y, bc0, bc1, a0, b0, a1, b1);
-};
+	printf("comp. %d BC = ", k);
+	switch (bc0)
+	{
+	case BC::Odd:
+		printf("odd ");
+		break;
+	case BC::Even:
+		printf("even ");
+		break;
+	case BC::Mix:
+		printf("mix ");
+		break;
+	default:
+		break;
+	}
+
+	switch (bc1)
+	{
+	case BC::Odd:
+		printf("odd\n");
+		break;
+	case BC::Even:
+		printf("even\n");
+		break;
+	case BC::Mix:
+		printf("mix\n");
+		break;
+	default:
+		break;
+	}
+
+	computeCoef(_component[k], bc0, bc1, a0, b0, a1, b1);
+}; // namespace spline
 
 void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double a1, double b1)
 {
@@ -198,13 +274,9 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 		double c1j = c1(j), c2j = c2(j), c1jp1 = c1(j + 1), c2jp1 = c2(j + 1);
 		// re-parametrize local spline - eqn (7.27)
 		x(j, 1) = c1j * hj;
-
 		x(j, 2) = c2j * hj * hj;
-
 		x(j, 3) = -6. * hj * c1j - 3. * hj * hj * c2j - 4. * hj * c1jp1 + 1. * hj * hj * c2jp1 + 10. * (X(j + 1) - X(j));
-
 		x(j, 4) = +8. * hj * c1j + 3. * hj * hj * c2j + 7. * hj * c1jp1 - 2. * hj * hj * c2jp1 - 15. * (X(j + 1) - X(j));
-
 		x(j, 5) = -3. * hj * c1j - 1. * hj * hj * c2j - 3. * hj * c1jp1 + 1. * hj * hj * c2jp1 + 6. * (X(j + 1) - X(j));
 	}
 };
@@ -241,7 +313,11 @@ double Quintic::localArc(int i, double t, int nqd) const
 		for (int k = 0; k < nqd; k++)
 		{
 			double ab = t * qdx[k];
-			arc += qdw[k] * sqrt(pow((d(_x, i, ab))(1), 2.0) + pow((d(_y, i, ab))(1), 2.0));
+			double tmp = 0;
+			for (Eigen::size_t q = 0; q < dim(); q++)
+				tmp += pow((d(component()[q], i, ab))(1), 2.0);
+
+			arc += qdw[k] * sqrt(tmp);
 		}
 		return t * arc;
 	}
@@ -261,7 +337,11 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	int counter = 0;
 	while (std::abs(f0) > epsilon)
 	{
-		double df0 = sqrt(pow((d(_x, i, x0))(1), 2.0) + pow((d(_y, i, x0))(1), 2.0));
+		double df0 = 0;
+		for (Eigen::size_t q = 0; q < dim(); q++)
+			df0 += pow((d(_component[q], i, x0))(1), 2.0);
+
+		//= sqrt(pow((d(_x, i, x0))(1), 2.0) + pow((d(_y, i, x0))(1), 2.0));
 		x0 = x0 - f0 / df0;
 		f0 = localArc(i, x0, nqd) - arc;
 		counter++;
