@@ -1,7 +1,7 @@
-#pragma once
 #ifndef SPLINE_H
 #define SPLINE_H
 #include <eigen3/Eigen/Core>
+#include <vector>
 
 namespace spline
 {
