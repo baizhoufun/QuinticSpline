@@ -1,6 +1,8 @@
 #include <eigen3/Eigen/Sparse>
 #include <fstream>
 
+#include <iostream>
+
 #include "quinticSpline.hpp"
 
 namespace spline
@@ -35,31 +37,37 @@ Quintic &Quintic::operator=(const Quintic &sp)
 		// 	return *this;
 	}
 };
+void Quintic::bc(int i, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
+{
+	_bc[i].bc0 = bc0;
+	_bc[i].bc1 = bc1;
+	_bc[i].a0 = a0;
+	_bc[i].a1 = a1;
+	_bc[i].b0 = b0;
+	_bc[i].b1 = b1;
+};
 
-void Quintic::node(const Eigen::MatrixXd &xy)
+void Quintic::init(const Eigen::MatrixXd &xy)
 {
 	_node.resize(xy.rows(), xy.cols());
 	_node = xy;
 	_dim = xy.cols();
 	_component.resize(dim());
+	_bc.resize(dim());
+}
 
+void Quintic::node()
+{
 	h(_node);
-
 	for (Eigen::size_t i = 0; i < dim(); i++)
 	{
 		setComponent(i, _component[i]);
 	}
 }
 
-void Quintic::node(const Eigen::MatrixXd &xy, const Eigen::VectorXd &chord)
+void Quintic::node(const Eigen::VectorXd &chord)
 {
-	_node.resize(xy.rows(), xy.cols());
-	_node = xy;
-	_dim = xy.cols();
-	_component.resize(dim());
-
 	_h = chord;
-
 	for (Eigen::size_t i = 0; i < dim(); i++)
 	{
 		setComponent(i, _component[i]);
@@ -108,18 +116,27 @@ const Eigen::VectorXd Quintic::arcIncrement() const
 	return tmp;
 };
 
-void Quintic::computeComponent(int k, BC bc0, BC bc1, double a0, double b0, double a1, double b1)
+void Quintic::computeComponent(int k)
 {
+
+	const BCType &bc0 = _bc[k].bc0;
+	const BCType &bc1 = _bc[k].bc1;
+
+	const double &a0 = _bc[k].a0;
+	const double &a1 = _bc[k].a1;
+	const double &b0 = _bc[k].b0;
+	const double &b1 = _bc[k].b1;
+
 	printf("comp. %d BC = ", k);
 	switch (bc0)
 	{
-	case BC::Odd:
+	case BCType::Odd:
 		printf("odd ");
 		break;
-	case BC::Even:
+	case BCType::Even:
 		printf("even ");
 		break;
-	case BC::Mix:
+	case BCType::Mix:
 		printf("mix ");
 		break;
 	default:
@@ -128,13 +145,13 @@ void Quintic::computeComponent(int k, BC bc0, BC bc1, double a0, double b0, doub
 
 	switch (bc1)
 	{
-	case BC::Odd:
+	case BCType::Odd:
 		printf("odd\n");
 		break;
-	case BC::Even:
+	case BCType::Even:
 		printf("even\n");
 		break;
-	case BC::Mix:
+	case BCType::Mix:
 		printf("mix\n");
 		break;
 	default:
@@ -144,7 +161,7 @@ void Quintic::computeComponent(int k, BC bc0, BC bc1, double a0, double b0, doub
 	computeCoef(_component[k], bc0, bc1, a0, b0, a1, b1);
 }; // namespace spline
 
-void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double a1, double b1)
+void Quintic::computeCoef(Coef &x, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
 {
 	Eigen::Index N = _node.rows() - 1;
 	Eigen::VectorXd rhs(2 * N + 2);
@@ -155,7 +172,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 
 	switch (bc0)
 	{
-	case BC::Even:
+	case BCType::Even:
 	{ // even condition - eqn (7.17)
 		rhs(0) = 0;
 		rhs(1) = -10. * X(0) + 10. * X(1);
@@ -167,7 +184,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 		A.insert(1, 3) = -h0 * h0;
 		break;
 	}
-	case BC::Odd:
+	case BCType::Odd:
 	{ // even condition - eqn (7.18)
 		rhs(0) = 15. * X(0) - 15. * X(1);
 		rhs(1) = 0;
@@ -179,7 +196,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 		A.insert(1, 1) = 1.0;
 		break;
 	}
-	case BC::Mix:
+	case BCType::Mix:
 	{ // mix condition - eqn (7.19)
 		rhs(0) = a0;
 		rhs(1) = b0 / 2;
@@ -192,7 +209,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 	}
 	switch (bc1)
 	{
-	case BC::Even:
+	case BCType::Even:
 	{ // even condition - eqn (7.23)
 		rhs(rhs.size() - 2) = 0;
 		rhs(rhs.size() - 1) = 10. * X(X.size() - 2) - 10. * X(X.size() - 1);
@@ -205,7 +222,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 		A.insert(A.rows() - 1, A.rows() - 1) = +3. * hm1 * hm1;
 		break;
 	}
-	case BC::Odd:
+	case BCType::Odd:
 	{ // even condition - eqn (7.24)
 		rhs(rhs.size() - 2) = 15. * X(X.size() - 2) - 15. * X(X.size() - 1);
 		rhs(rhs.size() - 1) = 0;
@@ -217,7 +234,7 @@ void Quintic::computeCoef(Coef &x, BC bc0, BC bc1, double a0, double b0, double 
 		A.insert(A.rows() - 1, A.rows() - 1) = 1.0;
 		break;
 	}
-	case BC::Mix:
+	case BCType::Mix:
 	{ // mix condition - eqn (7.25)
 		rhs(rhs.size() - 2) = a1;
 		rhs(rhs.size() - 1) = b1 / 2.;

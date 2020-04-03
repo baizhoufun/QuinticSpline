@@ -23,12 +23,19 @@ int main()
 		knots(i, 0) = sin(theta) * (1 + 0.26 * cos(4 * theta)); // x (or r) coord
 		knots(i, 1) = cos(theta) * (1 + 0.26 * cos(4 * theta)); // y (or z) coord
 	}
+
 	spline::Quintic sp;
-	sp.node(knots);
+	sp.init(knots);
+	sp.bc(0, spline::Quintic::BCType::Odd, spline::Quintic::BCType::Odd);
+	sp.bc(1, spline::Quintic::BCType::Even, spline::Quintic::BCType::Even);
 
 	// BC of axisymmetric shape
-	sp.computeComponent(0, spline::Quintic::BC::Odd, spline::Quintic::BC::Odd);
-	sp.computeComponent(1, spline::Quintic::BC::Even, spline::Quintic::BC::Even);
+	sp.node();
+	sp.computeComponent(0);
+	sp.computeComponent(1);
+
+	// BC of axisymmetric shape
+
 	std::cout << "=========== h ===========\n";
 	std::cout << Eigen::MatrixXd(sp.h()).format(fmt) << "\n";
 	std::cout << "=========== arc ===========\n";
@@ -38,16 +45,13 @@ int main()
 
 	for (int g = 0; g < 30; g++)
 	{
-
 		std::cout << "Compute global quintic spline of " << std::to_string(g) << " local spline segments ... \n";
 		// allocate knots input matrix
 
 		//spline::Quintic sp1;
-		sp.node(knots, sp.arcIncrement());
-
-		// BC of axisymmetric shape
-		sp.computeComponent(0, spline::Quintic::BC::Odd, spline::Quintic::BC::Odd);
-		sp.computeComponent(1, spline::Quintic::BC::Even, spline::Quintic::BC::Even);
+		sp.node(sp.arcIncrement());
+		sp.computeComponent(0);
+		sp.computeComponent(1);
 
 		// write to file
 		// std::string outputFile = std::to_string(N);
@@ -68,7 +72,5 @@ int main()
 		std::cout << Eigen::MatrixXd(sp.arcCoord()).format(fmt) << "\n";
 	}
 
-	std::cout << "Press enter to finish ... ";
-	std::cin.get(); // please stop to let me see
 	return 0;
 }
