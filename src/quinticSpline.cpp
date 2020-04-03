@@ -1,12 +1,26 @@
 #include <eigen3/Eigen/Sparse>
 #include <fstream>
-
 #include <iostream>
 
 #include "quinticSpline.hpp"
 
 namespace spline
 {
+int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
+{
+	int mid;
+	while (low < high - 1)
+	{
+		mid = low + ((high - low) / 2);
+		if (ar[mid + 1] >= key && ar[mid] <= key)
+			return mid;
+		if (ar[mid] > key) // key may be on the left half
+			high = mid;
+		else if (ar[mid] < key) // key may be on the right half
+			low = mid;
+	}
+	return -1;
+}
 
 void Quintic::write(const std::string &name)
 {
@@ -63,6 +77,7 @@ void Quintic::node()
 	{
 		setComponent(i, _component[i]);
 	}
+	//computeArcCoord();
 }
 
 void Quintic::node(const Eigen::VectorXd &chord)
@@ -72,6 +87,7 @@ void Quintic::node(const Eigen::VectorXd &chord)
 	{
 		setComponent(i, _component[i]);
 	}
+	//computeArcCoord();
 }
 
 void Quintic::h(const Eigen::MatrixXd &node)
@@ -93,16 +109,15 @@ void Quintic::setComponent(int i, Coef &x)
 	x.setZero();
 	x.col(0) = _node.col(i);
 };
-const Eigen::VectorXd Quintic::arcCoord() const
+void Quintic::computeArcCoord()
 {
-	Eigen::VectorXd tmp;
-	tmp.resize(h().size() + 1);
-	tmp.setZero();
-	for (Eigen::Index i = 1; i < tmp.size(); i++)
+
+	_arcCoord.resize(h().size() + 1);
+	_arcCoord.setZero();
+	for (Eigen::Index i = 1; i < _arcCoord.size(); i++)
 	{
-		tmp[i] = tmp[i - 1] + localArc(i - 1);
+		_arcCoord[i] = _arcCoord[i - 1] + localArc(i - 1);
 	}
-	return tmp;
 };
 const Eigen::VectorXd Quintic::arcIncrement() const
 {

@@ -13,7 +13,7 @@ int main()
 {
 	// total number of spline segments
 	Eigen::Index nodeNum[] = {20};
-	Eigen::Index N = 200;
+	Eigen::Index N = 15;
 	Eigen::MatrixXd knots;
 	knots.resize(N + 1, 2);
 	// generate knots from analytic shape
@@ -33,25 +33,23 @@ int main()
 	sp.node();
 	sp.computeComponent(0);
 	sp.computeComponent(1);
+	sp.computeArcCoord();
 
 	// BC of axisymmetric shape
 
-	std::cout << "=========== h ===========\n";
-	std::cout << Eigen::MatrixXd(sp.h()).format(fmt) << "\n";
-	std::cout << "=========== arc ===========\n";
-	std::cout << Eigen::MatrixXd(sp.arcIncrement()).format(fmt) << "\n";
-	std::cout << "=========== arcCoord ===========\n";
 	std::cout << Eigen::MatrixXd(sp.arcCoord()).format(fmt) << "\n";
+	int dd = spline::Quintic::search(sp.arcCoord(), sp.arcCoord()[sp.arcCoord().size() - 1]);
+	std::cout << dd << "\t";
 
-	for (int g = 0; g < 30; g++)
+	for (int g = 0; g < 0; g++)
 	{
 		std::cout << "Compute global quintic spline of " << std::to_string(g) << " local spline segments ... \n";
-		// allocate knots input matrix
 
 		//spline::Quintic sp1;
 		sp.node(sp.arcIncrement());
 		sp.computeComponent(0);
 		sp.computeComponent(1);
+		sp.computeArcCoord();
 
 		// write to file
 		// std::string outputFile = std::to_string(N);
@@ -63,13 +61,6 @@ int main()
 		// outputFile = "./resources/output/spline" + outputFile + ".txt";
 		// std::cout << "write to " << outputFile << std::endl;
 		// sp.write(outputFile);
-
-		std::cout << "=========== h ===========\n";
-		std::cout << Eigen::MatrixXd(sp.h()).format(fmt) << "\n";
-		std::cout << "=========== arc ===========\n";
-		std::cout << Eigen::MatrixXd(sp.arcIncrement()).format(fmt) << "\n";
-		std::cout << "=========== arcCoord ===========\n";
-		std::cout << Eigen::MatrixXd(sp.arcCoord()).format(fmt) << "\n";
 	}
 
 	return 0;

@@ -2,6 +2,7 @@
 #ifndef SPLINE_H
 #define SPLINE_H
 #include <eigen3/Eigen/Core>
+#include <vector>
 
 namespace spline
 {
@@ -27,8 +28,9 @@ private:
 	typedef Eigen::Matrix<double, Eigen::Dynamic, 6> Coef;
 	// ========== data member ==========
 	std::vector<Coef> _component;
-	Eigen::VectorXd _h;	   // chord
-	Eigen::MatrixXd _node; // node_ (input)
+	Eigen::VectorXd _h;		   // chord
+	Eigen::VectorXd _arcCoord; // chord
+	Eigen::MatrixXd _node;	   // node_ (input)
 	int _dim = 2;
 	std::vector<BC> _bc;
 
@@ -49,7 +51,8 @@ public:
 	void node(const Eigen::VectorXd &chord); // set node from input matrix
 	void computeComponent(int k);
 	// ========== API ==========
-	const Eigen::VectorXd arcCoord() const;
+	const Eigen::VectorXd &arcCoord() const { return _arcCoord; };
+
 	const Eigen::VectorXd arcIncrement() const;
 
 	// compute arc length of i-th local quintic spline
@@ -60,6 +63,9 @@ public:
 	const Eigen::Vector3d d(const Coef &x, int i, double t) const;
 	// output spline coefficient to file
 	void write(const std::string &name);
+	static int search(const Eigen::VectorXd &ar, double key, int low, int high);
+	static int search(const Eigen::VectorXd &ar, double key) { return search(ar, key, 0, ar.size() - 1); };
+	void computeArcCoord();
 
 private:
 	void h(const Eigen::MatrixXd &node);
