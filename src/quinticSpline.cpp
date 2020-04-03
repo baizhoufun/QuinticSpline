@@ -1,7 +1,5 @@
 #include <eigen3/Eigen/Sparse>
 #include <fstream>
-#include <iostream>
-
 #include "quinticSpline.hpp"
 
 namespace spline
@@ -384,6 +382,18 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	}
 	return x0;
 };
+
+Quintic::Quintic(){};
+Quintic::Quintic(const Quintic &sp) { *this = sp; }
+const int &Quintic::dim() const { return _dim; };
+const std::vector<Quintic::Coef> &Quintic::component() const { return _component; }; // x-coordinate (or r)
+const Quintic::Coef &Quintic::x() const { return _component[0]; };					 // x-coordinate (or r)
+const Quintic::Coef &Quintic::y() const { return _component[1]; };					 // x-coordinate (or r)
+const Quintic::Coef &Quintic::z() const { return _component[2]; };					 // x-coordinate (or r)
+const Eigen::VectorXd &Quintic::h() const { return _h; };							 // chord length
+const Eigen::MatrixXd &Quintic::node() const { return _node; };						 //spline knots
+const Eigen::VectorXd &Quintic::arcCoord() const { return _arcCoord; };
+int Quintic::search(const Eigen::VectorXd &ar, double key) { return search(ar, key, 0, ar.size() - 1); };
 
 // abscissa and weights of 20-point Gauss-Legendre quadrature rules
 const double Quintic::qd_GL_x20[20] = {0.0034357004074525, 0.0180140363610431, 0.0438827858743371, 0.0804415140888906, 0.1268340467699246, 0.1819731596367425, 0.2445664990245865, 0.3131469556422902, 0.3861070744291775, 0.4617367394332513, 0.5382632605667487, 0.6138929255708225, 0.6868530443577098, 0.7554335009754135, 0.8180268403632580, 0.8731659532300750, 0.9195584859111090, 0.9561172141256630, 0.9819859636389570, 0.9965642995925470};

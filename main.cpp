@@ -35,6 +35,7 @@ int main()
 	sp.computeComponent(1);
 	sp.computeArcCoord();
 
+	
 	// BC of axisymmetric shape
 
 	std::cout << Eigen::MatrixXd(sp.arcCoord()).format(fmt) << "\n";
