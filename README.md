@@ -6,9 +6,7 @@ Given a set of k-dimensional points
         
         {x0, x1, x2, ... , xN} 
 
-$$
-      \{\boldsymbol{x}_0, \boldsymbol{x}_1,\boldsymbol{x}_2, ... , \boldsymbol{x}_N\} 
-$$
+<p align="center"><img src="/tex/14dc45ce284c7354c0d8ca7534e97ef4.svg?invert_in_darkmode&sanitize=true" align=middle width=137.28534434999997pt height=16.438356pt/></p>
 
 Compute a set of quintic polynomials over interval `[0,1]` (i.e. quitic spline)
         
