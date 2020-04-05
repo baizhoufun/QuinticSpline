@@ -3,3 +3,4 @@
 *.txt
 !CMakeLists.txt
 *.a
+./resources/
