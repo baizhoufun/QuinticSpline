@@ -4,14 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/czhou/Projects/QuinticSpline/main.cpp" "/home/czhou/Projects/QuinticSpline/build/CMakeFiles/main.dir/main.cpp.o"
+  "/home/czhou/Projects/QuinticSpline/test/test2.cpp" "/home/czhou/Projects/QuinticSpline/build/CMakeFiles/main.dir/test/test2.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../src"
-  "/usr/local/include/eigen3"
+  "/usr/include/eigen3"
   )
 
 # Targets to which this target links.

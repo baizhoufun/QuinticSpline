@@ -106,48 +106,24 @@
 
 #elif defined(__IBMC__) && defined(__COMPILER_VER__)
 # define COMPILER_ID "zOS"
-# if defined(__ibmxl__)
-#  define COMPILER_VERSION_MAJOR DEC(__ibmxl_version__)
-#  define COMPILER_VERSION_MINOR DEC(__ibmxl_release__)
-#  define COMPILER_VERSION_PATCH DEC(__ibmxl_modification__)
-#  define COMPILER_VERSION_TWEAK DEC(__ibmxl_ptf_fix_level__)
-# else
-   /* __IBMC__ = VRP */
-#  define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
-#  define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
-#  define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
-# endif
+  /* __IBMC__ = VRP */
+# define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
+# define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
+# define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
 
-
-#elif defined(__ibmxl__) || (defined(__IBMC__) && !defined(__COMPILER_VER__) && __IBMC__ >= 800)
+#elif defined(__IBMC__) && !defined(__COMPILER_VER__) && __IBMC__ >= 800
 # define COMPILER_ID "XL"
-# if defined(__ibmxl__)
-#  define COMPILER_VERSION_MAJOR DEC(__ibmxl_version__)
-#  define COMPILER_VERSION_MINOR DEC(__ibmxl_release__)
-#  define COMPILER_VERSION_PATCH DEC(__ibmxl_modification__)
-#  define COMPILER_VERSION_TWEAK DEC(__ibmxl_ptf_fix_level__)
-# else
-   /* __IBMC__ = VRP */
-#  define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
-#  define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
-#  define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
-# endif
-
+  /* __IBMC__ = VRP */
+# define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
+# define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
+# define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
 
 #elif defined(__IBMC__) && !defined(__COMPILER_VER__) && __IBMC__ < 800
 # define COMPILER_ID "VisualAge"
-# if defined(__ibmxl__)
-#  define COMPILER_VERSION_MAJOR DEC(__ibmxl_version__)
-#  define COMPILER_VERSION_MINOR DEC(__ibmxl_release__)
-#  define COMPILER_VERSION_PATCH DEC(__ibmxl_modification__)
-#  define COMPILER_VERSION_TWEAK DEC(__ibmxl_ptf_fix_level__)
-# else
-   /* __IBMC__ = VRP */
-#  define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
-#  define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
-#  define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
-# endif
-
+  /* __IBMC__ = VRP */
+# define COMPILER_VERSION_MAJOR DEC(__IBMC__/100)
+# define COMPILER_VERSION_MINOR DEC(__IBMC__/10 % 10)
+# define COMPILER_VERSION_PATCH DEC(__IBMC__    % 10)
 
 #elif defined(__PGI)
 # define COMPILER_ID "PGI"
@@ -570,8 +546,7 @@ char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";
 
 
 #if !defined(__STDC__)
-# if (defined(_MSC_VER) && !defined(__clang__)) \
-  || (defined(__ibmxl__) || defined(__IBMC__))
+# if defined(_MSC_VER) && !defined(__clang__)
 #  define C_DIALECT "90"
 # else
 #  define C_DIALECT

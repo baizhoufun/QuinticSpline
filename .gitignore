@@ -1,3 +1,5 @@
 *.o
 *.log
 *.txt
+!CMakeLists.txt
+*.a
