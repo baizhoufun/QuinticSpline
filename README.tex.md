@@ -2,30 +2,46 @@
 
 ## Problem statement
 
-Given a set of k-dimensional points  
-        
-        {x0, x1, x2, ... , xN} 
+Given a set of k-dimensional points    
 
 $$
-      \{\boldsymbol{x}_0, \boldsymbol{x}_1,\boldsymbol{x}_2, ... , \boldsymbol{x}_N\} 
+      \{\boldsymbol{x}_0, \boldsymbol{x}_1,\boldsymbol{x}_2, ...\, , \boldsymbol{x}_N\}~, 
 $$
 
-Compute a set of quintic polynomials over interval `[0,1]` (i.e. quitic spline)
+we compute a set of polynomials (i.e. quintic spline)
         
-        {s0(t), s1(t), s2(t), ... , sN-1(t)} 
+$$\{\boldsymbol{s}_0(t), \boldsymbol{s}_1(t), \boldsymbol{s}_2(t), ...\, , \boldsymbol{s}_{N-1}(t)\} $$
 
-such that not only `si(0) = xi` but also
+where each spline segment is in the form
+a fifth-degree polynomial
+,
+$$\boldsymbol{s}_i(t)=
+\boldsymbol{a}_i
++\boldsymbol{b}_it
++\boldsymbol{c}_it^2
++\boldsymbol{d}_it^3
++\boldsymbol{e}_it^4
++\boldsymbol{f}_it^5~,
+$$
+
+over interval $t\in[0,1]$ such that
+ not only $\boldsymbol{s}_i(0) = \boldsymbol{x}_i$ but also
         
-        si(1) = si+1(0), 
-        si'(1) = si+1'(0), 
-        si''(1) = si+1''(0), 
-        si'''(1) = si+1'''(0), 
-        si''''(1) = si+1''''(0)
+$$\left\{
+\begin{aligned}
+\boldsymbol{s}_i(1) =\boldsymbol{s}_{i+1}(0) \\
+\boldsymbol{s}_i'(1) =\boldsymbol{s}_{i+1}'(0) \\
+\boldsymbol{s}_i''(1) =\boldsymbol{s}_{i+1}''(0) \\
+\boldsymbol{s}_i'''(1) =\boldsymbol{s}_{i+1}'''(0) \\
+\boldsymbol{s}_i'''(1) =\boldsymbol{s}_{i+1}''''(0) \\
+\end{aligned}\right.
+$$
 
-hold for `i = 0, 1, 2, ... , N-1` where each spline segment 
-is a fifth-degree polynomial,
+hold for $i = 0, 1, 2, ... \,, N-1$ 
 
-        si()²
+
+
+
 
 
 
