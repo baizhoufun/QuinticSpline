@@ -1,5 +1,6 @@
 #include <eigen3/Eigen/Core>
 #include <iostream>
+#include <fstream>
 
 #include "quinticSpline.hpp"
 
@@ -12,57 +13,56 @@ Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
 int main()
 {
 	// total number of spline segments
-	Eigen::Index nodeNum[] = {20};
-	Eigen::Index N = 15;
+	Eigen::Index N = 50;
+	int dim = 3;
 	Eigen::MatrixXd knots;
-	knots.resize(N + 1, 2);
+	knots.resize(N + 1, dim);
 	// generate knots from analytic shape
 	for (int i = 0; i < N + 1; i++)
 	{
 		double theta = (double)i / N * M_PI;
-		knots(i, 0) = sin(theta) * (1 + 0.26 * cos(4 * theta)); // x (or r) coord
-		knots(i, 1) = cos(theta) * (1 + 0.26 * cos(4 * theta)); // y (or z) coord
+		knots(i, 0) = 0.9 * theta + 0.6 * sin(4 * theta) * (1 + 0.26 * cos(4 * theta)); // x (or r) coord
+		knots(i, 1) = 0.6 * cos(4 * theta) * (1 + 0.26 * cos(4 * theta));				// y (or z) coord
+		knots(i, 2) = theta;
 	}
 
 	spline::Quintic sp;
 	sp.init(knots);
-	sp.bc(0, spline::Quintic::BCType::Odd, spline::Quintic::BCType::Odd);
-	sp.bc(1, spline::Quintic::BCType::Even, spline::Quintic::BCType::Even);
-
-	// BC of axisymmetric shape
 	sp.node();
-	sp.computeComponent(0);
-	sp.computeComponent(1);
-	sp.computeArcCoord();
 
-	
-	// BC of axisymmetric shape
+	sp.bc(0, spline::BCType::Odd, spline::BCType::Odd);
+	sp.bc(1, spline::BCType::Even, spline::BCType::Even);
+	double zslope = (knots(1, 2) - knots(0, 2)) / sp.h()[0];
+	sp.bc(2, spline::BCType::Mix, spline::BCType::Mix, zslope, 0, zslope, 0);
 
-	std::cout << Eigen::MatrixXd(sp.arcCoord()).format(fmt) << "\n";
-	int dd = spline::Quintic::search(sp.arcCoord(), sp.arcCoord()[sp.arcCoord().size() - 1]);
-	std::cout << dd << "\t";
+	sp.update();
 
-	for (int g = 0; g < 0; g++)
+	for (int g = 0; g < 10; g++)
 	{
-		std::cout << "Compute global quintic spline of " << std::to_string(g) << " local spline segments ... \n";
-
-		//spline::Quintic sp1;
 		sp.node(sp.arcIncrement());
-		sp.computeComponent(0);
-		sp.computeComponent(1);
-		sp.computeArcCoord();
-
-		// write to file
-		// std::string outputFile = std::to_string(N);
-		// int zeroNum = 3 - outputFile.length();
-		// for (int a = 0; a < zeroNum; a++)
-		// {
-		// 	outputFile = "0" + outputFile;
-		// }
-		// outputFile = "./resources/output/spline" + outputFile + ".txt";
-		// std::cout << "write to " << outputFile << std::endl;
-		// sp.write(outputFile);
+		sp.update();
 	}
+
+	sp.write("../resources/spline.txt");
+
+	int nA = 10;
+	Eigen::MatrixXd A(nA, dim);
+	A.setZero();
+	double dkey = sp.arcCoord()[sp.arcCoord().size() - 1] / (nA - 1);
+
+	for (int k = 0; k < nA; k++)
+	{
+		double key = k * dkey;
+		int dd = spline::Quintic::search(sp.arcCoord(), key);
+		double t = sp.arc2t(dd, (key - sp.arcCoord()[dd]));
+		A(k, 0) = sp.d(sp.x(), dd, t)(0);
+		A(k, 1) = sp.d(sp.y(), dd, t)(0);
+		A(k, 2) = sp.d(sp.z(), dd, t)(0);
+	}
+
+	std::ofstream file("../resources/scatter.txt");
+	file << A.format(fmt) << '\n';
+	file.close();
 
 	return 0;
 }

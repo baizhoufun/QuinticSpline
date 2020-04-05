@@ -6,15 +6,15 @@
 
 namespace spline
 {
+enum class BCType
+{
+	Even,
+	Odd,
+	Mix
+};
 class Quintic
 {
 public:
-	enum class BCType
-	{
-		Even,
-		Odd,
-		Mix
-	};
 	struct BC
 	{
 		BCType bc0, bc1;
@@ -49,6 +49,7 @@ public:
 	void node(const Eigen::VectorXd &chord); // set node from input matrix
 	void computeComponent(int k);
 	void computeArcCoord();
+	void update();
 	// ========== query API ==========
 	const Eigen::VectorXd arcIncrement() const;
 	double localArc(int i, double t = 1.0, int nqd = 20) const;
@@ -57,6 +58,7 @@ public:
 	void write(const std::string &name);
 	static int search(const Eigen::VectorXd &ar, double key, int low, int high);
 	static int search(const Eigen::VectorXd &ar, double key);
+	void write(const std::string &name) const;
 
 private:
 	void h(const Eigen::MatrixXd &node);

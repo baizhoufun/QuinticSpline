@@ -4,21 +4,50 @@
 
 namespace spline
 {
+
+void Quintic::update()
+{
+	for (int i = 0; i < dim(); i++)
+	{
+		computeComponent(i);
+	}
+	computeArcCoord();
+}
 int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 {
 	int mid;
-	while (low < high - 1)
+	// while (low < high - 1)
+	// {
+	// 	mid = low + ((high - low) / 2);
+	// 	if (ar[mid + 1] >= key && ar[mid] <= key)
+	// 		return mid;
+	// 	if (ar[mid] > key) // key may be on the left half
+	// 		high = mid;
+	// 	else if (ar[mid] < key) // key may be on the right half
+	// 		low = mid;
+	// }
+
+	// int mid;
+	while (low <= high)
 	{
-		mid = low + ((high - low) / 2);
-		if (ar[mid + 1] >= key && ar[mid] <= key)
+		int mid = low + ((high - low) / 2);
+
+		if (ar[mid + 1] >= key && ar[mid] <= key) // key found
+		{
 			return mid;
-		if (ar[mid] > key) // key may be on the left half
-			high = mid;
+		}
+		else if (ar[mid] > key) // key may be on the left half
+		{
+			high = mid - 1;
+		}
 		else if (ar[mid] < key) // key may be on the right half
-			low = mid;
+		{
+			low = mid + 1;
+		}
 	}
+
 	return -1;
-}
+} // namespace spline
 
 void Quintic::write(const std::string &name)
 {
@@ -361,15 +390,17 @@ double Quintic::localArc(int i, double t, int nqd) const
 double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 {
 	double x0 = 0.5;
-	double epsilon = eps;
+
 	double f0 = localArc(i, x0, nqd) - arc;
 	// find intrinsic coordiante that corresponds to a given arclength fraction - eqn (7.28)
 	int counter = 0;
-	while (std::abs(f0) > epsilon)
+	while (std::abs(f0) > eps)
 	{
 		double df0 = 0;
 		for (Eigen::size_t q = 0; q < dim(); q++)
 			df0 += pow((d(_component[q], i, x0))(1), 2.0);
+
+		df0 = sqrt(df0);
 
 		//= sqrt(pow((d(_x, i, x0))(1), 2.0) + pow((d(_y, i, x0))(1), 2.0));
 		x0 = x0 - f0 / df0;
@@ -382,6 +413,17 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	}
 	return x0;
 };
+
+void Quintic::write(const std::string &name) const
+{
+	std::ofstream file(name);
+	Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
+	file << x().format(fmt) << '\n'
+		 << y().format(fmt) << '\n'
+		 << h().format(fmt) << '\n';
+	file.close();
+	printf("IOInfo>>\twrite spline coefficients to %s\n", name.c_str());
+}
 
 Quintic::Quintic(){};
 Quintic::Quintic(const Quintic &sp) { *this = sp; }
