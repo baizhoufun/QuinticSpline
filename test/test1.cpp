@@ -15,10 +15,9 @@ int main()
     for (Eigen::Index &N : nodeNum)
     {
         std::cout << "Compute global quintic spline of " << std::to_string(N) << " local spline segments ... ";
-        // allocate knots input matrix
         Eigen::MatrixX2d knots;
         knots.resize(N + 1, 2);
-        // generate knots from analytic shape
+
         for (int i = 0; i < N + 1; i++)
         {
             double theta = (double)i / N * M_PI;
@@ -26,10 +25,10 @@ int main()
             knots(i, 1) = cos(theta) * (1 + 0.25 * cos(6 * theta)); // y (or z) coord
         }
         spline::Quintic sp;
-        sp.node(knots);
-        // BC of axisymmetric shape
-        sp.x(spline::Quintic::BC::Odd, spline::Quintic::BC::Odd);
-        sp.y(spline::Quintic::BC::Even, spline::Quintic::BC::Even);
+        sp.init(knots);
+        sp.node(); // BC of axisymmetric shape
+        sp.bc(0, spline::BCType::Odd, spline::BCType::Odd);
+        sp.bc(1, spline::BCType::Even, spline::BCType::Even);
 
         // write to file
         std::string outputFile = std::to_string(N);
@@ -40,9 +39,8 @@ int main()
         }
         outputFile = "./resources/output/spline" + outputFile + ".txt";
         std::cout << "write to " << outputFile << std::endl;
-        sp.printSpline(outputFile);
+        sp.write(outputFile);
     }
-    std::cout << "Press enter to finish ... ";
-    std::cin.get(); // please stop to let me see
+
     return 0;
 }

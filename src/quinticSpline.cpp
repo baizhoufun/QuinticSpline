@@ -49,7 +49,7 @@ int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 	return -1;
 } // namespace spline
 
-void Quintic::write(const std::string &name)
+void Quintic::write(const std::string &name) const
 {
 	Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
 	std::ofstream file(name);

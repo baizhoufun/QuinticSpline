@@ -1,6 +1,6 @@
 #pragma once
-#ifndef SPLINE_H
-#define SPLINE_H
+#ifndef QUINTICSPLINE_HPP
+#define QUINTICSPLINE_HPP
 #include <eigen3/Eigen/Core>
 #include <vector>
 
@@ -55,7 +55,7 @@ public:
 	double localArc(int i, double t = 1.0, int nqd = 20) const;
 	double arc2t(int i, double arc, double eps = 5.e-14, int nqd = 20) const;
 	const Eigen::Vector3d d(const Coef &x, int i, double t) const;
-	void write(const std::string &name);
+
 	static int search(const Eigen::VectorXd &ar, double key, int low, int high);
 	static int search(const Eigen::VectorXd &ar, double key);
 	void write(const std::string &name) const;
