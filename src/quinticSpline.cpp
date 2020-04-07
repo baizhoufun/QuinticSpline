@@ -49,18 +49,6 @@ int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 	return -1;
 } // namespace spline
 
-void Quintic::write(const std::string &name) const
-{
-	Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
-	std::ofstream file(name);
-	for (size_t i = 0; i < component().size(); i++)
-	{
-		file << component()[i].format(fmt) << '\n';
-	}
-	file << h().format(fmt) << '\n';
-	file.close();
-}
-
 Quintic &Quintic::operator=(const Quintic &sp)
 {
 	if (this == &sp)
@@ -78,7 +66,7 @@ Quintic &Quintic::operator=(const Quintic &sp)
 		// 	return *this;
 	}
 };
-void Quintic::bc(int i, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
+void Quintic::setBC(int i, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
 {
 	_bc[i].bc0 = bc0;
 	_bc[i].bc1 = bc1;
@@ -97,7 +85,7 @@ void Quintic::init(const Eigen::MatrixXd &xy)
 	_bc.resize(dim());
 }
 
-void Quintic::node()
+void Quintic::setNode()
 {
 	h(_node);
 	for (Eigen::size_t i = 0; i < dim(); i++)
@@ -107,7 +95,7 @@ void Quintic::node()
 	//computeArcCoord();
 }
 
-void Quintic::node(const Eigen::VectorXd &chord)
+void Quintic::setNode(const Eigen::VectorXd &chord)
 {
 	_h = chord;
 	for (Eigen::size_t i = 0; i < dim(); i++)
@@ -414,15 +402,74 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	return x0;
 };
 
+Eigen::MatrixXd Quintic::arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType) const
+{
+	int nA = arcPoints.size();
+	Eigen::MatrixXd A(nA, dim());
+	A.setZero();
+	//double dkey = sp.arcCoord()[sp.arcCoord().size() - 1] / (nA - 1);
+
+	int kBegin = 0, kEnd = 0;
+
+	switch (sampleType)
+	{
+	case SampleType::HeadSnap:
+	{
+		A.row(0) = node().row(0);
+		kBegin = 1;
+		kEnd = nA;
+	}
+	break;
+	case SampleType::TailSnap:
+	{
+		A.row(nA - 1) = node().row(node().rows() - 1);
+		kBegin = 0;
+		kEnd = nA - 1;
+	}
+	break;
+	case SampleType::FullSnap:
+	{
+		A.row(0) = node().row(0);
+		A.row(nA - 1) = node().row(node().rows() - 1);
+		kBegin = 1;
+		kEnd = nA - 1;
+	}
+	break;
+	case SampleType::DontSnap:
+	{
+		kBegin = 0;
+		kEnd = nA;
+	}
+	break;
+
+	default:
+		break;
+	}
+
+	for (int k = kBegin; k < kEnd; k++)
+	{
+		double key = arcPoints(k); //k * dkey * pow((double)k / (nA - 1), 1.1);
+		int dd = spline::Quintic::search(arcCoord(), key);
+		double t = arc2t(dd, (key - arcCoord()[dd]));
+		for (int q = 0; q < dim(); q++)
+		{
+			A(k, q) = d(component()[q], dd, t)(0);
+		}
+	}
+
+	return A;
+};
+
 void Quintic::write(const std::string &name) const
 {
-	std::ofstream file(name);
 	Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
-	file << x().format(fmt) << '\n'
-		 << y().format(fmt) << '\n'
-		 << h().format(fmt) << '\n';
+	std::ofstream file(name);
+	for (size_t i = 0; i < component().size(); i++)
+	{
+		file << component()[i].format(fmt) << '\n';
+	}
+	file << h().format(fmt) << '\n';
 	file.close();
-	printf("IOInfo>>\twrite spline coefficients to %s\n", name.c_str());
 }
 
 Quintic::Quintic(){};

@@ -26,9 +26,9 @@ int main()
         }
         spline::Quintic sp;
         sp.init(knots);
-        sp.node(); // BC of axisymmetric shape
-        sp.bc(0, spline::BCType::Odd, spline::BCType::Odd);
-        sp.bc(1, spline::BCType::Even, spline::BCType::Even);
+        sp.setNode(); // BC of axisymmetric shape
+        sp.setBC(0, spline::BCType::Odd, spline::BCType::Odd);
+        sp.setBC(1, spline::BCType::Even, spline::BCType::Even);
 
         // write to file
         std::string outputFile = std::to_string(N);

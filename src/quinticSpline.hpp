@@ -12,6 +12,14 @@ enum class BCType
 	Odd,
 	Mix
 };
+enum class SampleType
+{
+	HeadSnap,
+	TailSnap,
+	FullSnap,
+	DontSnap
+};
+
 class Quintic
 {
 public:
@@ -43,10 +51,10 @@ public:
 	const Eigen::MatrixXd &node() const;		//spline knots
 	const Eigen::VectorXd &arcCoord() const;
 	// ========== real computation ==========
-	void bc(int i, BCType bc0, BCType bc1, double a0 = 0, double b0 = 0, double a1 = 0, double b1 = 0);
 	void init(const Eigen::MatrixXd &xy);
-	void node();							 // set node from input matrix
-	void node(const Eigen::VectorXd &chord); // set node from input matrix
+	void setNode();								// set node from input matrix
+	void setNode(const Eigen::VectorXd &chord); // set node from input matrix
+	void setBC(int i, BCType bc0, BCType bc1, double a0 = 0, double b0 = 0, double a1 = 0, double b1 = 0);
 	void computeComponent(int k);
 	void computeArcCoord();
 	void update();
@@ -54,8 +62,8 @@ public:
 	const Eigen::VectorXd arcIncrement() const;
 	double localArc(int i, double t = 1.0, int nqd = 20) const;
 	double arc2t(int i, double arc, double eps = 5.e-14, int nqd = 20) const;
+	Eigen::MatrixXd arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType = SampleType::DontSnap) const;
 	const Eigen::Vector3d d(const Coef &x, int i, double t) const;
-
 	static int search(const Eigen::VectorXd &ar, double key, int low, int high);
 	static int search(const Eigen::VectorXd &ar, double key);
 	void write(const std::string &name) const;
