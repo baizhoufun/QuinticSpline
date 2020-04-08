@@ -3,5 +3,5 @@
 *.txt
 !CMakeLists.txt
 *.a
-resources/
 build/
+resources/.ipynb_checkpoints/
