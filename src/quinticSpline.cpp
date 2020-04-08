@@ -8,62 +8,40 @@ namespace spline
 void Quintic::update()
 {
 	for (int i = 0; i < dim(); i++)
-	{
 		computeComponent(i);
-	}
+
 	computeArcCoord();
 }
+
 int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 {
 	int mid;
-	// while (low < high - 1)
-	// {
-	// 	mid = low + ((high - low) / 2);
-	// 	if (ar[mid + 1] >= key && ar[mid] <= key)
-	// 		return mid;
-	// 	if (ar[mid] > key) // key may be on the left half
-	// 		high = mid;
-	// 	else if (ar[mid] < key) // key may be on the right half
-	// 		low = mid;
-	// }
-
-	// int mid;
 	while (low <= high)
 	{
 		int mid = low + ((high - low) / 2);
-
 		if (ar[mid + 1] >= key && ar[mid] <= key) // key found
-		{
 			return mid;
-		}
 		else if (ar[mid] > key) // key may be on the left half
-		{
 			high = mid - 1;
-		}
 		else if (ar[mid] < key) // key may be on the right half
-		{
 			low = mid + 1;
-		}
 	}
-
 	return -1;
 } // namespace spline
 
-Quintic &Quintic::operator=(const Quintic &sp)
+Quintic &Quintic::operator=(const Quintic &that)
 {
-	if (this == &sp)
+	if (this == &that)
 		return *this;
 	else
 	{
-		// 	_node.resize(sp.node().rows(), 2);
-		// 	_node = sp.node();
-		// 	_h.resize(sp.h().size());
-		// 	_h = sp.h();
-		// 	_x.resize(sp.x().rows(), 6);
-		// 	_x = sp.x();
-		// 	_y.resize(sp.y().rows(), 6);
-		// 	_y = sp.y();
-		// 	return *this;
+		_h = that.h();
+		_arcCoord = that.arcCoord();
+		_node = that.node();
+		_bc.assign(that.bc().begin(), that.bc().end());
+		_component.assign(that.component().begin(), that.component().end());
+		_dim = that.dim();
+		return *this;
 	}
 };
 void Quintic::setBC(int i, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
@@ -89,20 +67,14 @@ void Quintic::setNode()
 {
 	h(_node);
 	for (Eigen::size_t i = 0; i < dim(); i++)
-	{
 		setComponent(i, _component[i]);
-	}
-	//computeArcCoord();
 }
 
 void Quintic::setNode(const Eigen::VectorXd &chord)
 {
 	_h = chord;
 	for (Eigen::size_t i = 0; i < dim(); i++)
-	{
 		setComponent(i, _component[i]);
-	}
-	//computeArcCoord();
 }
 
 void Quintic::h(const Eigen::MatrixXd &node)
@@ -118,7 +90,7 @@ void Quintic::h(const Eigen::MatrixXd &node)
 	}
 };
 
-void Quintic::setComponent(int i, Coef &x)
+void Quintic::setComponent(int i, CoefficientMat &x)
 {
 	x.resize(_node.rows(), 6);
 	x.setZero();
@@ -188,10 +160,10 @@ void Quintic::computeComponent(int k)
 		break;
 	}
 
-	computeCoef(_component[k], bc0, bc1, a0, b0, a1, b1);
+	computeCoefficient(_component[k], bc0, bc1, a0, b0, a1, b1);
 }; // namespace spline
 
-void Quintic::computeCoef(Coef &x, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
+void Quintic::computeCoefficient(CoefficientMat &x, BCType bc0, BCType bc1, double a0, double b0, double a1, double b1)
 {
 	Eigen::Index N = _node.rows() - 1;
 	Eigen::VectorXd rhs(2 * N + 2);
@@ -328,7 +300,7 @@ void Quintic::computeCoef(Coef &x, BCType bc0, BCType bc1, double a0, double b0,
 	}
 };
 
-const Eigen::Vector3d Quintic::d(const Coef &x, int i, double t) const
+const Eigen::Vector3d Quintic::d(const CoefficientMat &x, int i, double t) const
 {
 	double t2 = t * t;
 	double t3 = t * t * t;
@@ -380,7 +352,7 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	double x0 = 0.5;
 
 	double f0 = localArc(i, x0, nqd) - arc;
-	// find intrinsic coordiante that corresponds to a given arclength fraction - eqn (7.28)
+	// find intrinsic coordinate that corresponds to a given arclength fraction - eqn (7.28)
 	int counter = 0;
 	while (std::abs(f0) > eps)
 	{
@@ -473,17 +445,31 @@ void Quintic::write(const std::string &name) const
 }
 
 Quintic::Quintic(){};
-Quintic::Quintic(const Quintic &sp) { *this = sp; }
+Quintic::Quintic(const Quintic &that)
+{
+	_h = that.h();
+	_arcCoord = that.arcCoord();
+	_node = that.node();
+	_bc.assign(that.bc().begin(), that.bc().end());
+	_component.assign(that.component().begin(), that.component().end());
+	_dim = that.dim();
+}
 const int &Quintic::dim() const { return _dim; };
-const std::vector<Quintic::Coef> &Quintic::component() const { return _component; }; // x-coordinate (or r)
-const Quintic::Coef &Quintic::x() const { return _component[0]; };					 // x-coordinate (or r)
-const Quintic::Coef &Quintic::y() const { return _component[1]; };					 // x-coordinate (or r)
-const Quintic::Coef &Quintic::z() const { return _component[2]; };					 // x-coordinate (or r)
-const Eigen::VectorXd &Quintic::h() const { return _h; };							 // chord length
-const Eigen::MatrixXd &Quintic::node() const { return _node; };						 //spline knots
+const std::vector<Quintic::CoefficientMat> &Quintic::component() const { return _component; }; // x-coordinate (or r)
+const Quintic::CoefficientMat &Quintic::x() const { return _component[0]; };				   // x-coordinate (or r)
+const Quintic::CoefficientMat &Quintic::y() const
+{
+	return _component[1 > dim() - 1 ? dim() - 1 : 1];
+}; // x-coordinate (or r)
+const Quintic::CoefficientMat &Quintic::z() const
+{
+	return _component[2 > dim() - 1 ? dim() - 1 : 2];
+};																// x-coordinate (or r)
+const Eigen::VectorXd &Quintic::h() const { return _h; };		// chord length
+const Eigen::MatrixXd &Quintic::node() const { return _node; }; //spline knots
 const Eigen::VectorXd &Quintic::arcCoord() const { return _arcCoord; };
 int Quintic::search(const Eigen::VectorXd &ar, double key) { return search(ar, key, 0, ar.size() - 1); };
-
+const std::vector<Quintic::BC> &Quintic::bc() const { return _bc; }
 // abscissa and weights of 20-point Gauss-Legendre quadrature rules
 const double Quintic::qd_GL_x20[20] = {0.0034357004074525, 0.0180140363610431, 0.0438827858743371, 0.0804415140888906, 0.1268340467699246, 0.1819731596367425, 0.2445664990245865, 0.3131469556422902, 0.3861070744291775, 0.4617367394332513, 0.5382632605667487, 0.6138929255708225, 0.6868530443577098, 0.7554335009754135, 0.8180268403632580, 0.8731659532300750, 0.9195584859111090, 0.9561172141256630, 0.9819859636389570, 0.9965642995925470};
 const double Quintic::qd_GL_w20[20] = {0.0088070035695761, 0.0203007149001935, 0.0313360241670545, 0.0416383707883524, 0.0509650599086202, 0.0590972659807592, 0.0658443192245883, 0.0710480546591910, 0.0745864932363019, 0.0763766935653629, 0.0763766935653629, 0.0745864932363019, 0.0710480546591910, 0.0658443192245883, 0.0590972659807592, 0.0509650599086202, 0.0416383707883524, 0.0313360241670545, 0.0203007149001935, 0.0088070035695761};

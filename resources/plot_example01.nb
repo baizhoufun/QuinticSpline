@@ -1,0 +1,10 @@
+In[2]:= SetDirectory[NotebookDirectory[]];
+spline=Import["../examples/01/spline.txt","Table"];
+l=(Length@spline+1)/4
+knots=Transpose@{spline[[1;;l,1]],spline[[1+l;;2l,1]],spline[[1+2l;;3l,1]]};
+Show[Graphics3D[{Point@%,Line[%]}],BoxRatios->Automatic]
+Out[73]= 51
+Out[75]= 
+In[82]:= Import["../examples/01/scatter.txt","Table"];
+Graphics3D[{Point@%,Line[%]}]
+Out[83]= 

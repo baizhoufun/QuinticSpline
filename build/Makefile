@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named main
-
-# Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 main
-.PHONY : main
-
-# fast build rule for target.
-main/fast:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
-
-#=============================================================================
 # Target rules for targets named QSpline
 
 # Build rule for target.
@@ -135,6 +122,32 @@ QSpline: cmake_check_build_system
 QSpline/fast:
 	$(MAKE) -f CMakeFiles/QSpline.dir/build.make CMakeFiles/QSpline.dir/build
 .PHONY : QSpline/fast
+
+#=============================================================================
+# Target rules for targets named example00
+
+# Build rule for target.
+example00: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example00
+.PHONY : example00
+
+# fast build rule for target.
+example00/fast:
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/build
+.PHONY : example00/fast
+
+#=============================================================================
+# Target rules for targets named example01
+
+# Build rule for target.
+example01: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example01
+.PHONY : example01
+
+# fast build rule for target.
+example01/fast:
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/build
+.PHONY : example01/fast
 
 src/quinticSpline.o: src/quinticSpline.cpp.o
 
@@ -163,32 +176,59 @@ src/quinticSpline.cpp.s:
 	$(MAKE) -f CMakeFiles/QSpline.dir/build.make CMakeFiles/QSpline.dir/src/quinticSpline.cpp.s
 .PHONY : src/quinticSpline.cpp.s
 
-test/test2.o: test/test2.cpp.o
+test/example00.o: test/example00.cpp.o
 
-.PHONY : test/test2.o
+.PHONY : test/example00.o
 
 # target to build an object file
-test/test2.cpp.o:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/test/test2.cpp.o
-.PHONY : test/test2.cpp.o
+test/example00.cpp.o:
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/test/example00.cpp.o
+.PHONY : test/example00.cpp.o
 
-test/test2.i: test/test2.cpp.i
+test/example00.i: test/example00.cpp.i
 
-.PHONY : test/test2.i
+.PHONY : test/example00.i
 
 # target to preprocess a source file
-test/test2.cpp.i:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/test/test2.cpp.i
-.PHONY : test/test2.cpp.i
+test/example00.cpp.i:
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/test/example00.cpp.i
+.PHONY : test/example00.cpp.i
 
-test/test2.s: test/test2.cpp.s
+test/example00.s: test/example00.cpp.s
 
-.PHONY : test/test2.s
+.PHONY : test/example00.s
 
 # target to generate assembly for a file
-test/test2.cpp.s:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/test/test2.cpp.s
-.PHONY : test/test2.cpp.s
+test/example00.cpp.s:
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/test/example00.cpp.s
+.PHONY : test/example00.cpp.s
+
+test/example01.o: test/example01.cpp.o
+
+.PHONY : test/example01.o
+
+# target to build an object file
+test/example01.cpp.o:
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/test/example01.cpp.o
+.PHONY : test/example01.cpp.o
+
+test/example01.i: test/example01.cpp.i
+
+.PHONY : test/example01.i
+
+# target to preprocess a source file
+test/example01.cpp.i:
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/test/example01.cpp.i
+.PHONY : test/example01.cpp.i
+
+test/example01.s: test/example01.cpp.s
+
+.PHONY : test/example01.s
+
+# target to generate assembly for a file
+test/example01.cpp.s:
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/test/example01.cpp.s
+.PHONY : test/example01.cpp.s
 
 # Help Target
 help:
@@ -196,16 +236,20 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... main"
 	@echo "... QSpline"
+	@echo "... rebuild_cache"
+	@echo "... example00"
+	@echo "... example01"
+	@echo "... edit_cache"
 	@echo "... src/quinticSpline.o"
 	@echo "... src/quinticSpline.i"
 	@echo "... src/quinticSpline.s"
-	@echo "... test/test2.o"
-	@echo "... test/test2.i"
-	@echo "... test/test2.s"
+	@echo "... test/example00.o"
+	@echo "... test/example00.i"
+	@echo "... test/example00.s"
+	@echo "... test/example01.o"
+	@echo "... test/example01.i"
+	@echo "... test/example01.s"
 .PHONY : help
 
 

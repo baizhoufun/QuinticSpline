@@ -65,43 +65,6 @@ CMAKE_SOURCE_DIR = /home/czhou/Projects/QuinticSpline
 CMAKE_BINARY_DIR = /home/czhou/Projects/QuinticSpline/build
 
 #=============================================================================
-# Target rules for target CMakeFiles/main.dir
-
-# All Build rule for target.
-CMakeFiles/main.dir/all: CMakeFiles/QSpline.dir/all
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/czhou/Projects/QuinticSpline/build/CMakeFiles --progress-num=3,4 "Built target main"
-.PHONY : CMakeFiles/main.dir/all
-
-# Include target in all.
-all: CMakeFiles/main.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/main.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 0
-.PHONY : CMakeFiles/main.dir/rule
-
-# Convenience name for target.
-main: CMakeFiles/main.dir/rule
-
-.PHONY : main
-
-# clean rule for target.
-CMakeFiles/main.dir/clean:
-	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
-.PHONY : CMakeFiles/main.dir/clean
-
-# clean rule for target.
-clean: CMakeFiles/main.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
 # Target rules for target CMakeFiles/QSpline.dir
 
 # All Build rule for target.
@@ -135,6 +98,80 @@ CMakeFiles/QSpline.dir/clean:
 
 # clean rule for target.
 clean: CMakeFiles/QSpline.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/example00.dir
+
+# All Build rule for target.
+CMakeFiles/example00.dir/all: CMakeFiles/QSpline.dir/all
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/depend
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/czhou/Projects/QuinticSpline/build/CMakeFiles --progress-num=3,4 "Built target example00"
+.PHONY : CMakeFiles/example00.dir/all
+
+# Include target in all.
+all: CMakeFiles/example00.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/example00.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/example00.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 0
+.PHONY : CMakeFiles/example00.dir/rule
+
+# Convenience name for target.
+example00: CMakeFiles/example00.dir/rule
+
+.PHONY : example00
+
+# clean rule for target.
+CMakeFiles/example00.dir/clean:
+	$(MAKE) -f CMakeFiles/example00.dir/build.make CMakeFiles/example00.dir/clean
+.PHONY : CMakeFiles/example00.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/example00.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/example01.dir
+
+# All Build rule for target.
+CMakeFiles/example01.dir/all: CMakeFiles/QSpline.dir/all
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/depend
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/czhou/Projects/QuinticSpline/build/CMakeFiles --progress-num=5,6 "Built target example01"
+.PHONY : CMakeFiles/example01.dir/all
+
+# Include target in all.
+all: CMakeFiles/example01.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/example01.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/example01.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/czhou/Projects/QuinticSpline/build/CMakeFiles 0
+.PHONY : CMakeFiles/example01.dir/rule
+
+# Convenience name for target.
+example01: CMakeFiles/example01.dir/rule
+
+.PHONY : example01
+
+# clean rule for target.
+CMakeFiles/example01.dir/clean:
+	$(MAKE) -f CMakeFiles/example01.dir/build.make CMakeFiles/example01.dir/clean
+.PHONY : CMakeFiles/example01.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/example01.dir/clean
 
 .PHONY : clean
 
