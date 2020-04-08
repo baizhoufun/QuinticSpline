@@ -12,7 +12,7 @@ Eigen::IOFormat fmt(Eigen::FullPrecision, 0, "\t", "\n", "", "", "", "");
 
 int main()
 {
-	Eigen::size_t N = 40;
+	Eigen::size_t N = 50;
 	int dim = 3;
 	Eigen::MatrixXd knots;
 	knots.resize(N + 1, dim);
