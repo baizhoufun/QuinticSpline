@@ -12,12 +12,12 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_library(QSpline ${SRC}/quinticSpline.cpp)
 
-add_executable(example00 ${ROOT}/test/example00.cpp)
+add_executable(example00 ${ROOT}/examples/00.cpp)
 target_link_libraries(example00 PUBLIC QSpline
 ${EIGEN3_LIBS}
 )
 
-add_executable(example01 ${ROOT}/test/example01.cpp)
+add_executable(example01 ${ROOT}/examples/01.cpp)
 target_link_libraries(example01 PUBLIC QSpline
 ${EIGEN3_LIBS}
 )
