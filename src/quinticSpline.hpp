@@ -19,6 +19,11 @@ enum class SampleType
 	FullSnap,
 	DontSnap
 };
+enum class Curvature2DType
+{
+	XY,
+	RZ
+};
 
 class Quintic
 {
@@ -54,27 +59,31 @@ public:
 	// ========== real computation ==========
 	void init(const Eigen::MatrixXd &xy);
 	void setNode();								// set node from input
-	void setNode(const Eigen::VectorXd &chord); // set node and choord from input
+	void setNode(const Eigen::VectorXd &chord); // set node and chord from input
 	void setBC(int i, BCType bc0, BCType bc1, double a0 = 0, double b0 = 0, double a1 = 0, double b1 = 0);
 	void computeComponent(int k);
-	void computeArcCoord();
 	void update();
 	// ========== query API ==========
 	void write(const std::string &name) const;
 	static int search(const Eigen::VectorXd &ar, double key, int low, int high);
 	static int search(const Eigen::VectorXd &ar, double key);
-	const Eigen::VectorXd arcIncrement() const;
 	double localArc(int i, double t = 1.0, int nqd = 20) const;
 	double arc2t(int i, double arc, double eps = 5.e-14, int nqd = 20) const;
-	Eigen::MatrixXd arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType = SampleType::DontSnap) const;
+	const Eigen::MatrixXd arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType = SampleType::DontSnap) const;
 	const Eigen::Vector3d d(const CoefficientMat &x, int i, double t) const;
+	const Eigen::VectorXd arcIncrement() const;
+	const Eigen::VectorXd curvature2D(Curvature2DType curvature2DType) const;
 
 private:
 	void h(const Eigen::MatrixXd &node);
 	void setComponent(int i, CoefficientMat &x);
 	void computeCoefficient(CoefficientMat &x, BCType bc0, BCType bc1, double a0 = 0, double b0 = 0, double a1 = 0, double b1 = 0);
+	void computeArcCoord();
+
 	static const double qd_GL_x20[20]; // Gauss-Legendre quadrature abscissa
 	static const double qd_GL_w20[20]; // Gauss-Legendre quadrature weights
+	static double curvatureXY(double dx, double ddx, double dy, double ddy);
+	static double curvatureRZ(double r, double dr, double ddr, double dz, double ddz);
 };
 } // namespace spline
 

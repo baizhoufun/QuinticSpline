@@ -1,3 +1,4 @@
+#include <cmath>
 #include <eigen3/Eigen/Sparse>
 #include <fstream>
 #include "quinticSpline.hpp"
@@ -27,7 +28,7 @@ int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 			low = mid + 1;
 	}
 	return -1;
-} // namespace spline
+}
 
 Quintic &Quintic::operator=(const Quintic &that)
 {
@@ -96,9 +97,9 @@ void Quintic::setComponent(int i, CoefficientMat &x)
 	x.setZero();
 	x.col(0) = _node.col(i);
 };
+
 void Quintic::computeArcCoord()
 {
-
 	_arcCoord.resize(h().size() + 1);
 	_arcCoord.setZero();
 	for (Eigen::Index i = 1; i < _arcCoord.size(); i++)
@@ -106,6 +107,53 @@ void Quintic::computeArcCoord()
 		_arcCoord[i] = _arcCoord[i - 1] + localArc(i - 1);
 	}
 };
+const Eigen::VectorXd Quintic::curvature2D(Curvature2DType curvature2DType) const
+{
+	Eigen::VectorXd curvature;
+	curvature.resize(node().rows());
+	curvature.setZero();
+	for (Eigen::Index i = 0; i < curvature.size() - 1; i++)
+	{
+		Eigen::Vector3d xc = d(_component[0], i, 0);
+		Eigen::Vector3d yc = d(_component[1], i, 0);
+
+		switch (curvature2DType)
+		{
+		case Curvature2DType::XY:
+		{
+			curvature(i) = curvatureXY(xc(1), xc(2), yc(1), yc(2));
+			break;
+		}
+		case Curvature2DType::RZ:
+		{
+			curvature(i) = curvatureRZ(xc(0), xc(1), xc(2), yc(1), yc(2));
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	Eigen::Index last = curvature.size() - 1;
+	Eigen::Vector3d xc = d(_component[0], last, 1.0);
+	Eigen::Vector3d yc = d(_component[1], last, 1.0);
+	switch (curvature2DType)
+	{
+	case Curvature2DType::XY:
+	{
+		curvature(last) = curvatureXY(xc(1), xc(2), yc(1), yc(2));
+		break;
+	}
+	case Curvature2DType::RZ:
+	{
+		curvature(last) = curvatureRZ(xc(0), xc(1), xc(2), yc(1), yc(2));
+		break;
+	}
+	default:
+		break;
+	}
+	return curvature;
+};
+
 const Eigen::VectorXd Quintic::arcIncrement() const
 {
 	Eigen::VectorXd tmp;
@@ -374,7 +422,7 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	return x0;
 };
 
-Eigen::MatrixXd Quintic::arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType) const
+const Eigen::MatrixXd Quintic::arcSample(const Eigen::VectorXd &arcPoints, SampleType sampleType) const
 {
 	int nA = arcPoints.size();
 	Eigen::MatrixXd A(nA, dim());
@@ -470,6 +518,24 @@ const Eigen::MatrixXd &Quintic::node() const { return _node; }; //spline knots
 const Eigen::VectorXd &Quintic::arcCoord() const { return _arcCoord; };
 int Quintic::search(const Eigen::VectorXd &ar, double key) { return search(ar, key, 0, ar.size() - 1); };
 const std::vector<Quintic::BC> &Quintic::bc() const { return _bc; }
+double Quintic::curvatureXY(double dx, double ddx, double dy, double ddy)
+{
+	return (dx * ddy - dy * ddx) / pow(dx * dx + dy * dy, 1.5);
+}
+
+double Quintic::curvatureRZ(double r, double dr, double ddr, double dz, double ddz)
+{
+	double eps = 1e-10;
+
+	if (std::abs(r) > eps)
+	{
+		return (dr * ddz - dz * ddr) / pow(dr * dr + dz * dz, 1.5) + dz / sqrt(dr * dr + dz * dz) / r;
+	}
+	else
+	{
+		return 2.0 * ddz / dr / dr;
+	}
+};
 // abscissa and weights of 20-point Gauss-Legendre quadrature rules
 const double Quintic::qd_GL_x20[20] = {0.0034357004074525, 0.0180140363610431, 0.0438827858743371, 0.0804415140888906, 0.1268340467699246, 0.1819731596367425, 0.2445664990245865, 0.3131469556422902, 0.3861070744291775, 0.4617367394332513, 0.5382632605667487, 0.6138929255708225, 0.6868530443577098, 0.7554335009754135, 0.8180268403632580, 0.8731659532300750, 0.9195584859111090, 0.9561172141256630, 0.9819859636389570, 0.9965642995925470};
 const double Quintic::qd_GL_w20[20] = {0.0088070035695761, 0.0203007149001935, 0.0313360241670545, 0.0416383707883524, 0.0509650599086202, 0.0590972659807592, 0.0658443192245883, 0.0710480546591910, 0.0745864932363019, 0.0763766935653629, 0.0763766935653629, 0.0745864932363019, 0.0710480546591910, 0.0658443192245883, 0.0590972659807592, 0.0509650599086202, 0.0416383707883524, 0.0313360241670545, 0.0203007149001935, 0.0088070035695761};
