@@ -536,6 +536,66 @@ double Quintic::curvatureRZ(double r, double dr, double ddr, double dz, double d
 		return 2.0 * ddz / dr / dr;
 	}
 };
+
+double Quintic::estimateDerivative(int component, BCLocation loc, int derivativeOrder) const
+{
+
+	switch (loc)
+	{
+	case BCLocation::Begin:
+	{
+		double f0 = node()(0, component);
+		double f1 = node()(1, component);
+		double f2 = node()(2, component);
+		double h0 = h()(0);
+		double h1 = h()(1);
+		switch (derivativeOrder)
+		{
+		case 1:
+		{
+			return (f1 - f0) / h0;
+			break;
+		}
+		case 2:
+		{
+			return 2.0 * ((f0 - f1) / h0 + (f2 - f1) / h1) / (h0 + h1);
+			break;
+		}
+
+		default:
+			break;
+		}
+		break;
+	}
+	case BCLocation::End:
+	{
+		double f0 = node()(node().rows() - 3, component);
+		double f1 = node()(node().rows() - 2, component);
+		double f2 = node()(node().rows() - 1, component);
+		double h0 = h()(h().size() - 2);
+		double h1 = h()(h().size() - 1);
+		switch (derivativeOrder)
+		{
+		case 1:
+		{
+			return (f2 - f1) / h1;
+			break;
+		}
+		case 2:
+		{
+			return 2.0 * ((f0 - f1) / h0 + (f2 - f1) / h1) / (h0 + h1);
+			break;
+		}
+
+		default:
+			break;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+};
 // abscissa and weights of 20-point Gauss-Legendre quadrature rules
 const double Quintic::qd_GL_x20[20] = {0.0034357004074525, 0.0180140363610431, 0.0438827858743371, 0.0804415140888906, 0.1268340467699246, 0.1819731596367425, 0.2445664990245865, 0.3131469556422902, 0.3861070744291775, 0.4617367394332513, 0.5382632605667487, 0.6138929255708225, 0.6868530443577098, 0.7554335009754135, 0.8180268403632580, 0.8731659532300750, 0.9195584859111090, 0.9561172141256630, 0.9819859636389570, 0.9965642995925470};
 const double Quintic::qd_GL_w20[20] = {0.0088070035695761, 0.0203007149001935, 0.0313360241670545, 0.0416383707883524, 0.0509650599086202, 0.0590972659807592, 0.0658443192245883, 0.0710480546591910, 0.0745864932363019, 0.0763766935653629, 0.0763766935653629, 0.0745864932363019, 0.0710480546591910, 0.0658443192245883, 0.0590972659807592, 0.0509650599086202, 0.0416383707883524, 0.0313360241670545, 0.0203007149001935, 0.0088070035695761};

@@ -25,6 +25,12 @@ enum class Curvature2DType
 	RZ
 };
 
+enum class BCLocation
+{
+	Begin,
+	End
+};
+
 class Quintic
 {
 public:
@@ -73,6 +79,7 @@ public:
 	const Eigen::Vector3d d(const CoefficientMat &x, int i, double t) const;
 	const Eigen::VectorXd arcIncrement() const;
 	const Eigen::VectorXd curvature2D(Curvature2DType curvature2DType) const;
+	double estimateDerivative(int component, BCLocation loc, int derivativeOrder) const;
 
 private:
 	void h(const Eigen::MatrixXd &node);

@@ -31,8 +31,10 @@ int main()
 
 	sp.setBC(0, spline::BCType::Odd, spline::BCType::Odd);
 	sp.setBC(1, spline::BCType::Even, spline::BCType::Even);
-	double zSlope = (knots(1, 2) - knots(0, 2)) / sp.h()[0];
-	sp.setBC(2, spline::BCType::Mix, spline::BCType::Mix, zSlope, 0, zSlope, 0);
+	//double zSlope = (knots(1, 2) - knots(0, 2)) / sp.h()[0];
+	double zSlopeBegin = sp.estimateDerivative(2, spline::BCLocation::Begin, 1);
+	double zSlopeEnd = sp.estimateDerivative(2, spline::BCLocation::End, 1);
+	sp.setBC(2, spline::BCType::Mix, spline::BCType::Mix, zSlopeBegin, 0, zSlopeEnd, 0);
 	sp.update();
 
 	spline::Quintic sp1(sp);
