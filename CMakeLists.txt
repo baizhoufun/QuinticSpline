@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.9)
 
-add_compile_options(-std=c++11)
-add_compile_options(-O3)
+add_compile_options(-std=c++11 -Wall)
 
 set(ROOT ${PROJECT_SOURCE_DIR})
 set(SRC "${ROOT}/src")

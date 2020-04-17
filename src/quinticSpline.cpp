@@ -16,7 +16,7 @@ void Quintic::update()
 
 int Quintic::search(const Eigen::VectorXd &ar, double key, int low, int high)
 {
-	int mid;
+	//int mid;
 	while (low <= high)
 	{
 		int mid = low + ((high - low) / 2);
@@ -67,24 +67,24 @@ void Quintic::init(const Eigen::MatrixXd &xy)
 void Quintic::setNode()
 {
 	h(_node);
-	for (Eigen::size_t i = 0; i < dim(); i++)
+	for (int i = 0; i < dim(); i++)
 		setComponent(i, _component[i]);
 }
 
 void Quintic::setNode(const Eigen::VectorXd &chord)
 {
 	_h = chord;
-	for (Eigen::size_t i = 0; i < dim(); i++)
+	for (int i = 0; i < dim(); i++)
 		setComponent(i, _component[i]);
 }
 
 void Quintic::h(const Eigen::MatrixXd &node)
 {
 	_h.setZero(node.rows() - 1);
-	for (Eigen::size_t i = 0; i < _h.size(); i++)
+	for (int i = 0; i < _h.size(); i++)
 	{
 		double tmp = 0;
-		for (Eigen::size_t k = 0; k < node.cols(); k++)
+		for (int k = 0; k < node.cols(); k++)
 			tmp += pow(node(i + 1, k) - node(i, k), 2.0);
 
 		_h(i) = sqrt(tmp);
@@ -381,7 +381,7 @@ double Quintic::localArc(int i, double t, int nqd) const
 		{
 			double ab = t * qdx[k];
 			double tmp = 0;
-			for (Eigen::size_t q = 0; q < dim(); q++)
+			for (int q = 0; q < dim(); q++)
 				tmp += pow((d(component()[q], i, ab))(1), 2.0);
 
 			arc += qdw[k] * sqrt(tmp);
@@ -405,7 +405,7 @@ double Quintic::arc2t(int i, double arc, double eps, int nqd) const
 	while (std::abs(f0) > eps)
 	{
 		double df0 = 0;
-		for (Eigen::size_t q = 0; q < dim(); q++)
+		for (int q = 0; q < dim(); q++)
 			df0 += pow((d(_component[q], i, x0))(1), 2.0);
 
 		df0 = sqrt(df0);
@@ -539,7 +539,6 @@ double Quintic::curvatureRZ(double r, double dr, double ddr, double dz, double d
 
 double Quintic::estimateDerivative(int component, BCLocation loc, int derivativeOrder) const
 {
-
 	switch (loc)
 	{
 	case BCLocation::Begin:
@@ -595,6 +594,8 @@ double Quintic::estimateDerivative(int component, BCLocation loc, int derivative
 	default:
 		break;
 	}
+
+	return 0;
 };
 // abscissa and weights of 20-point Gauss-Legendre quadrature rules
 const double Quintic::qd_GL_x20[20] = {0.0034357004074525, 0.0180140363610431, 0.0438827858743371, 0.0804415140888906, 0.1268340467699246, 0.1819731596367425, 0.2445664990245865, 0.3131469556422902, 0.3861070744291775, 0.4617367394332513, 0.5382632605667487, 0.6138929255708225, 0.6868530443577098, 0.7554335009754135, 0.8180268403632580, 0.8731659532300750, 0.9195584859111090, 0.9561172141256630, 0.9819859636389570, 0.9965642995925470};

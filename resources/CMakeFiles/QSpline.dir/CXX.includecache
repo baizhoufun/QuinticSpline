@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/czhou/Projects/QuinticSpline/src/quinticSpline.cpp
+cmath
+-
+eigen3/Eigen/Sparse
+-
+fstream
+-
+quinticSpline.hpp
+/home/czhou/Projects/QuinticSpline/src/quinticSpline.hpp
+
+/home/czhou/Projects/QuinticSpline/src/quinticSpline.hpp
+eigen3/Eigen/Core
+-
+vector
+-
+
