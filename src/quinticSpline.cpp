@@ -176,7 +176,7 @@ void Quintic::computeComponent(int k)
 	const double &a1 = _bc[k].a1;
 	const double &b0 = _bc[k].b0;
 	const double &b1 = _bc[k].b1;
-
+	/*
 	printf("comp. %d BC = ", k);
 	switch (bc0)
 	{
@@ -207,7 +207,7 @@ void Quintic::computeComponent(int k)
 	default:
 		break;
 	}
-
+*/
 	computeCoefficient(_component[k], bc0, bc1, a0, b0, a1, b1);
 }; // namespace spline
 
